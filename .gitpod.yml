@@ -1,0 +1,10 @@
+image:
+  file: .gitpod.dockerfile
+ports:
+- port: 6080
+  onOpen: open-browser #notify
+- port: 5900
+  onOpen: ignore
+tasks:
+- init: cmake . && make
+  command: ./practica1
