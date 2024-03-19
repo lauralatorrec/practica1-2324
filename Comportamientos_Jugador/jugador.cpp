@@ -4,9 +4,99 @@ using namespace std;
 
 Action ComportamientoJugador::think(Sensores sensores)
 {
-
 	Action accion = actIDLE;
+	int a;
 
+	//Actualización del mundo:
+	switch(last_action){
+		case actWALK: //avanzar
+			switch (current_state.brujula){
+				case norte: 
+					current_state.fil--; 
+				break;
+				case noreste: 
+					current_state.fil--;
+					current_state.col++;
+				break;
+				case este: 
+					current_state.col++; 
+				break;
+				case sureste: 
+					current_state.fil++;
+					current_state.col++;
+				break;
+				case sur: 
+					current_state.fil++; 
+				break;
+				case suroeste: 
+					current_state.fil++;
+					current_state.col--;
+				break;
+				case oeste: 
+					current_state.col--; 
+				break;
+				case noroeste: 
+					current_state.fil--;
+					current_state.col--;
+				break;
+			}
+		break;
+
+		case actRUN: //correr
+
+		break;
+
+		case actTURN_SR: //girar 45º a la derecha
+			a = current_state.brujula;
+			a = (a+1)%8; //modulo 8 ya que hay 8 posibles sentidos
+			current_state.brujula = static_cast<Orientacion>(a);
+		break;
+
+		case actTURN_L: //girar 90º a la izquierda
+			a = current_state.brujula;
+			a = (a+7)%8; //equivalente a (a-1+8)%8 y (a-1)%8 pero no usamos num neg
+			current_state.brujula = static_cast<Orientacion>(a);
+		break;
+	}
+
+	//Definicion de reglas:
+
+	//-Captura valores fil, col y orient
+	//sustituir cond por (sensores.posF != -1 && !bien_situado)
+	if(sensores.terreno[0]=='G' and !bien_situado){
+		current_state.fil=sensores.posF;
+		current_state.col=sensores.posC;
+		current_state.brujula=sensores.sentido;
+		bien_situado=true;
+	}
+
+	//-
+	if(bien_situado){
+		mapaResultado[current_state.fil][current_state.col]=sensores.terreno[0]; //la cas 0 es la actual en la que se encuentra el jugador
+		//la anterior linea se sustituirá por la función:
+		//PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
+		/*
+		void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
+			matriz[st.fil][st.col] = terreno[0];
+		}
+		*/
+	}
+
+	//*Decision de la nueva accion
+	//-Avanzar solo si casilla destino es terreno arenoso o pedregroso o es cas de posicionamiento y no esta ocupada, sino, giro 45º izq
+	if ((sensores.terreno[2]=='T' or sensores.terreno[2]=='S' or sensores.terreno[2]=='G') and sensores.agentes[2]=='_'){
+		accion = actWALK;
+	} else if(!girar_derecha){
+		accion = actTURN_L;
+		girar_derecha = (rand()%2==0);
+	}else{
+		accion = actTURN_SR;
+		girar_derecha = (rand()%2==0)
+	}
+
+	// Actualización de acción realizada
+	last_action = accion; 
+	
 	// Mostrar el valor de los sensores
 	cout << "Posicion: fila " << sensores.posF << " columna " << sensores.posC;
 	switch (sensores.sentido)
@@ -32,6 +122,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 	cout << "  Reset: " << sensores.reset;
 	cout << "  Vida: " << sensores.vida << endl<< endl;
 
+	//Devuelve acción a realizar
 	return accion;
 }
 
