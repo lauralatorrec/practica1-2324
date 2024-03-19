@@ -8,7 +8,7 @@ struct state{
   int fil;
   int col;
   Orientacion brujula;
-}
+};
 
 class ComportamientoJugador : public Comportamiento{
 
@@ -17,8 +17,8 @@ class ComportamientoJugador : public Comportamiento{
     // Constructor de la clase
     ComportamientoJugador(unsigned int size) : Comportamiento(size){
       // Dar el valor inicial a las variables de estado
-      current_state.fil = current_satte.col = 99;
-      current_satte.brujula = norte;
+      current_state.fil = current_state.col = 99;
+      current_state.brujula = norte;
       last_action = actIDLE;
       girar_derecha = false;
       bien_situado=false;
