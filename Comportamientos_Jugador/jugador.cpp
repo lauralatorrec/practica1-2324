@@ -91,7 +91,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 		girar_derecha = (rand()%2==0);
 	}else{
 		accion = actTURN_SR;
-		girar_derecha = (rand()%2==0)
+		girar_derecha = (rand()%2==0);
 	}
 
 	// Actualización de acción realizada
