@@ -9,8 +9,8 @@ include(CMakePrintHelpers)
 project(Motor_Grafico_Belkan)
 
 # problema deteccion librerias glut - mgo -------
-set(OpenMP_CXX_FLAGS "-Xclang -fopenmp")
-set(OpenMP_CXX_LIB_NAMES "libomp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/lib/x86_64-linux-gnu -lglut")
+set(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/libglut")
 
 #########################################################
 # FIND GLUT
