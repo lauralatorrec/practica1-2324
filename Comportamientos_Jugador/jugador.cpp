@@ -63,34 +63,27 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 	//-Captura valores fil, col y orient
 	//sustituir cond por (sensores.posF != -1 && !bien_situado)
-	if(sensores.terreno[0]=='G' and !bien_situado){
+	if((sensores.terreno[0]=='G') && !bien_situado){ /
 		current_state.fil=sensores.posF;
 		current_state.col=sensores.posC;
 		current_state.brujula=sensores.sentido;
 		bien_situado=true;
 	}
-
-	//-
-	if(bien_situado){
-		mapaResultado[current_state.fil][current_state.col]=sensores.terreno[0]; //la cas 0 es la actual en la que se encuentra el jugador
-		//la anterior linea se sustituirá por la función:
-		//PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
-		/*
-		void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
-			matriz[st.fil][st.col] = terreno[0];
-		}
-		*/
+	
+	//Si está en una cas de pos estará bien situado, podemos registrar lo que ve el jugador en nuestro mapaResultado
+	if(bien_situado){ 
+		PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
 	}
 
-	//*Decision de la nueva accion
-	//-Avanzar solo si casilla destino es terreno arenoso o pedregroso o es cas de posicionamiento y no esta ocupada, sino, giro 45º izq
-	if ((sensores.terreno[2]=='T' or sensores.terreno[2]=='S' or sensores.terreno[2]=='G') and sensores.agentes[2]=='_'){
-		accion = actWALK;
-	} else if(!girar_derecha){
-		accion = actTURN_L;
-		girar_derecha = (rand()%2==0);
+	//Decision de la nueva accion
+	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S' || sensores.terreno[2]=='G') && sensores.agentes[2]=='_'){
+		accion = actWALK;	//avanzar solo si casilla destino es terreno arenoso o pedregroso o es cas de posicionamiento
+	} //SINO PUDE AVANZAR:
+	else if(!girar_derecha){ //girar_derecha es un booleano inicializado a false por lo que entrará aqui primero
+		accion = actTURN_L; //girará a la izq
+		girar_derecha = (rand()%2==0); //NUEVO VALOR ALEATORIO PARA girar_derecha
 	}else{
-		accion = actTURN_SR;
+		accion = actTURN_SR; //girará a la der
 		girar_derecha = (rand()%2==0);
 	}
 
@@ -125,6 +118,17 @@ Action ComportamientoJugador::think(Sensores sensores)
 	//Devuelve acción a realizar
 	return accion;
 }
+
+// extiende esta version inicial donde solo se pone la componente 0 
+// en la matriz; la nueva version debe poner todas las componentes 
+// de terreno en funcion de la orientacion del agente
+void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
+			//sensores.terreno -> terreno
+			//current_state -> st 
+			//mapaResultado -> matriz
+			matriz[st.fil][st.col] = terreno[0]; 
+}
+
 
 int ComportamientoJugador::interact(Action accion, int valor)
 {

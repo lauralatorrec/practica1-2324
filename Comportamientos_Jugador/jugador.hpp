@@ -33,6 +33,7 @@ class ComportamientoJugador : public Comportamiento{
     //Funciones
     Action think(Sensores sensores);
     int interact(Action accion, int valor);
+    void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz);
 
   private:
   // Declarar aquí las variables de estado
