@@ -62,8 +62,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 	//Definicion de reglas:
 
 	//-Captura valores fil, col y orient
-	//sustituir cond por (sensores.posF != -1 && !bien_situado)
-	if((sensores.terreno[0]=='G') && !bien_situado){ /
+	//sustituir cond por (sensores.terreno[0]=='G' && !bien_situado)
+	if( sensores.posF != -1 && !bien_situado){ 
 		current_state.fil=sensores.posF;
 		current_state.col=sensores.posC;
 		current_state.brujula=sensores.sentido;
@@ -122,13 +122,173 @@ Action ComportamientoJugador::think(Sensores sensores)
 // extiende esta version inicial donde solo se pone la componente 0 
 // en la matriz; la nueva version debe poner todas las componentes 
 // de terreno en funcion de la orientacion del agente
-void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
-			//sensores.terreno -> terreno
-			//current_state -> st 
-			//mapaResultado -> matriz
-			matriz[st.fil][st.col] = terreno[0]; 
-}
+void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
+	//sensores.terreno -> terreno
+	//current_state -> st 
+	//mapaResultado -> matriz
 
+	matriz[st.fil][st.col] = terreno[0]; 
+
+	switch (st.brujula){
+		case norte: 
+			matriz[st.fil-1][st.col-1] = terreno[1]; 
+			matriz[st.fil-1][st.col] = terreno[2]; 
+			matriz[st.fil-1][st.col+1] = terreno[3]; 
+
+			matriz[st.fil-2][st.col-2] = terreno[4]; 
+			matriz[st.fil-2][st.col-1] = terreno[5]; 
+			matriz[st.fil-2][st.col] = terreno[6]; 
+			matriz[st.fil-2][st.col+1] = terreno[7]; 
+			matriz[st.fil-2][st.col+2] = terreno[8]; 
+
+			matriz[st.fil-3][st.col-3] = terreno[9]; 
+			matriz[st.fil-3][st.col-2] = terreno[10]; 
+			matriz[st.fil-3][st.col-1] = terreno[11]; 
+			matriz[st.fil-3][st.col] = terreno[12]; 
+			matriz[st.fil-3][st.col+1] = terreno[13]; 
+			matriz[st.fil-3][st.col+2] = terreno[14]; 
+			matriz[st.fil-3][st.col+3] = terreno[15]; 
+		break;
+		case noreste: 
+			matriz[st.fil-1][st.col] = terreno[1]; 
+			matriz[st.fil-2][st.col] = terreno[4]; 
+			matriz[st.fil-3][st.col] = terreno[9]; 
+
+			matriz[st.fil][st.col+1] = terreno[3]; 
+			matriz[st.fil-1][st.col+1] = terreno[2]; 
+			matriz[st.fil-2][st.col+1] = terreno[5]; 
+			matriz[st.fil-3][st.col+1] = terreno[10]; 
+
+			matriz[st.fil][st.col+2] = terreno[8]; 
+			matriz[st.fil-1][st.col+2] = terreno[7]; 
+			matriz[st.fil-2][st.col+2] = terreno[6]; 
+			matriz[st.fil-3][st.col+2] = terreno[11]; 
+
+			matriz[st.fil][st.col+3] = terreno[15]; 
+			matriz[st.fil-1][st.col+3] = terreno[14]; 
+			matriz[st.fil-2][st.col+3] = terreno[13]; 
+			matriz[st.fil-3][st.col+3] = terreno[12]; 
+		break;
+		case este: 
+			matriz[st.fil-1][st.col+1] = terreno[1]; 
+			matriz[st.fil][st.col+1] = terreno[2]; 
+			matriz[st.fil+1][st.col+1] = terreno[3]; 
+
+			matriz[st.fil-2][st.col+2] = terreno[4]; 
+			matriz[st.fil-1][st.col+2] = terreno[5]; 
+			matriz[st.fil][st.col+2] = terreno[6]; 
+			matriz[st.fil+1][st.col+2] = terreno[7]; 
+			matriz[st.fil+2][st.col+2] = terreno[8]; 
+
+			matriz[st.fil-3][st.col+3] = terreno[9]; 
+			matriz[st.fil-2][st.col+3] = terreno[10]; 
+			matriz[st.fil-1][st.col+3] = terreno[11]; 
+			matriz[st.fil][st.col+3] = terreno[12]; 
+			matriz[st.fil+1][st.col+3] = terreno[13]; 
+			matriz[st.fil+2][st.col+3] = terreno[14]; 
+			matriz[st.fil+3][st.col+3] = terreno[15]; 
+		break;
+		case sureste: 
+			matriz[st.fil][st.col+1] = terreno[1]; 
+			matriz[st.fil][st.col+2] = terreno[4]; 
+			matriz[st.fil][st.col+3] = terreno[9]; 
+
+			matriz[st.fil+1][st.col] = terreno[3]; 
+			matriz[st.fil+1][st.col+1] = terreno[2]; 
+			matriz[st.fil+1][st.col+2] = terreno[5]; 
+			matriz[st.fil+1][st.col+3] = terreno[10]; 
+
+			matriz[st.fil+2][st.col] = terreno[8]; 
+			matriz[st.fil+2][st.col+1] = terreno[7]; 
+			matriz[st.fil+2][st.col+2] = terreno[6]; 
+			matriz[st.fil+2][st.col+3] = terreno[11]; 
+
+			matriz[st.fil+3][st.col] = terreno[15]; 
+			matriz[st.fil+3][st.col+1] = terreno[14]; 
+			matriz[st.fil+3][st.col+2] = terreno[13]; 
+			matriz[st.fil+3][st.col+3] = terreno[12];
+		break;
+		case sur: 
+			matriz[st.fil+1][st.col+1] = terreno[1]; 
+			matriz[st.fil+1][st.col] = terreno[2]; 
+			matriz[st.fil+1][st.col-1] = terreno[3]; 
+
+			matriz[st.fil+2][st.col+2] = terreno[4]; 
+			matriz[st.fil+2][st.col+1] = terreno[5]; 
+			matriz[st.fil+2][st.col] = terreno[6]; 
+			matriz[st.fil+2][st.col-1] = terreno[7]; 
+			matriz[st.fil+2][st.col-2] = terreno[8]; 
+
+			matriz[st.fil+3][st.col+3] = terreno[9]; 
+			matriz[st.fil+3][st.col+2] = terreno[10]; 
+			matriz[st.fil+3][st.col+1] = terreno[11]; 
+			matriz[st.fil+3][st.col] = terreno[12]; 
+			matriz[st.fil+3][st.col-1] = terreno[13]; 
+			matriz[st.fil+3][st.col-2] = terreno[14]; 
+			matriz[st.fil+3][st.col-3] = terreno[15]; 
+		break;
+		case suroeste: 
+			matriz[st.fil+1][st.col] = terreno[1]; 
+			matriz[st.fil+2][st.col] = terreno[4]; 
+			matriz[st.fil+3][st.col] = terreno[9]; 
+
+			matriz[st.fil][st.col-1] = terreno[3]; 
+			matriz[st.fil+1][st.col-1] = terreno[2]; 
+			matriz[st.fil+2][st.col-1] = terreno[5]; 
+			matriz[st.fil+3][st.col-1] = terreno[10]; 
+
+			matriz[st.fil][st.col-2] = terreno[8]; 
+			matriz[st.fil+1][st.col-2] = terreno[7]; 
+			matriz[st.fil+2][st.col-2] = terreno[6]; 
+			matriz[st.fil+3][st.col-2] = terreno[11]; 
+
+			matriz[st.fil][st.col-3] = terreno[15]; 
+			matriz[st.fil+1][st.col-3] = terreno[14]; 
+			matriz[st.fil+2][st.col-3] = terreno[13]; 
+			matriz[st.fil+3][st.col-3] = terreno[12];
+		break;
+		case oeste: 
+			matriz[st.fil+1][st.col-1] = terreno[1]; 
+			matriz[st.fil][st.col-1] = terreno[2]; 
+			matriz[st.fil-1][st.col-1] = terreno[3]; 
+
+			matriz[st.fil+2][st.col-2] = terreno[4]; 
+			matriz[st.fil+1][st.col-2] = terreno[5]; 
+			matriz[st.fil][st.col-2] = terreno[6]; 
+			matriz[st.fil-1][st.col-2] = terreno[7]; 
+			matriz[st.fil-2][st.col-2] = terreno[8]; 
+
+			matriz[st.fil+3][st.col-3] = terreno[9]; 
+			matriz[st.fil+2][st.col-3] = terreno[10]; 
+			matriz[st.fil+1][st.col-3] = terreno[11]; 
+			matriz[st.fil][st.col-3] = terreno[12]; 
+			matriz[st.fil-1][st.col-3] = terreno[13]; 
+			matriz[st.fil-2][st.col-3] = terreno[14]; 
+			matriz[st.fil-3][st.col-3] = terreno[15]; 
+		break;
+		case noroeste: 
+			matriz[st.fil][st.col-1] = terreno[1]; 
+			matriz[st.fil][st.col-2] = terreno[4]; 
+			matriz[st.fil][st.col-3] = terreno[9]; 
+
+			matriz[st.fil-1][st.col] = terreno[3]; 
+			matriz[st.fil-1][st.col-1] = terreno[2]; 
+			matriz[st.fil-1][st.col-2] = terreno[5]; 
+			matriz[st.fil-1][st.col-3] = terreno[10]; 
+
+			matriz[st.fil-2][st.col] = terreno[8]; 
+			matriz[st.fil-2][st.col-1] = terreno[7]; 
+			matriz[st.fil-2][st.col-2] = terreno[6]; 
+			matriz[st.fil-2][st.col-3] = terreno[11]; 
+
+			matriz[st.fil-3][st.col] = terreno[15]; 
+			matriz[st.fil-3][st.col-1] = terreno[14]; 
+			matriz[st.fil-3][st.col-2] = terreno[13]; 
+			matriz[st.fil-3][st.col-3] = terreno[12];
+
+		break;
+	}
+}
 
 int ComportamientoJugador::interact(Action accion, int valor)
 {
