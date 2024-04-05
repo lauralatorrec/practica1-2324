@@ -43,7 +43,36 @@ Action ComportamientoJugador::think(Sensores sensores)
 		break;
 
 		case actRUN: //correr
-
+			switch (current_state.brujula){
+				case norte: 
+					current_state.fil-2; 
+				break;
+				case noreste: 
+					current_state.fil-2;
+					current_state.col+2;
+				break;
+				case este: 
+					current_state.col+2; 
+				break;
+				case sureste: 
+					current_state.fil+2;
+					current_state.col+2;
+				break;
+				case sur: 
+					current_state.fil+2; 
+				break;
+				case suroeste: 
+					current_state.fil+2;
+					current_state.col-2;
+				break;
+				case oeste: 
+					current_state.col-2; 
+				break;
+				case noroeste: 
+					current_state.fil-2;
+					current_state.col-2;
+				break;
+			}
 		break;
 
 		case actTURN_SR: //girar 45º a la derecha
@@ -54,38 +83,34 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 		case actTURN_L: //girar 90º a la izquierda
 			a = current_state.brujula;
-			a = (a+7)%8; //equivalente a (a-1+8)%8 y (a-1)%8 pero no usamos num neg
+			a = (a+6)%8; //equivalente a (a-1+8)%8 y (a-1)%8 pero no usamos num neg
 			current_state.brujula = static_cast<Orientacion>(a);
 		break;
 	}
 
+
 	//Definicion de reglas:
-
-	//-Captura valores fil, col y orient
-	//sustituir cond por (sensores.terreno[0]=='G' && !bien_situado)
-	if( sensores.posF != -1 && !bien_situado){ 
-		current_state.fil=sensores.posF;
-		current_state.col=sensores.posC;
-		current_state.brujula=sensores.sentido;
-		bien_situado=true;
-	}
 	
-	//Si está en una cas de pos estará bien situado, podemos registrar lo que ve el jugador en nuestro mapaResultado
-	if(bien_situado){ 
-		PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
-	}
+		if( sensores.terreno[0] == 'G' && !bien_situado){ 
+			current_state.fil=sensores.posF;
+			current_state.col=sensores.posC;
+			current_state.brujula=sensores.sentido;
+			bien_situado=true;
+		}
+		
+		//Si está en una cas de pos estará bien situado, podemos registrar lo que ve el jugador en nuestro mapaResultado
+		if(bien_situado){ 
+			PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
+		}
 
-	//Decision de la nueva accion
-	if ((sensores.terreno[2]=='T' || sensores.terreno[2]=='S' || sensores.terreno[2]=='G') && sensores.agentes[2]=='_'){
-		accion = actWALK;	//avanzar solo si casilla destino es terreno arenoso o pedregroso o es cas de posicionamiento
-	} //SINO PUDE AVANZAR:
-	else if(!girar_derecha){ //girar_derecha es un booleano inicializado a false por lo que entrará aqui primero
-		accion = actTURN_L; //girará a la izq
-		girar_derecha = (rand()%2==0); //NUEVO VALOR ALEATORIO PARA girar_derecha
-	}else{
-		accion = actTURN_SR; //girará a la der
-		girar_derecha = (rand()%2==0);
-	}
+		elegirPrioridad();
+
+
+
+
+
+	
+	
 
 	// Actualización de acción realizada
 	last_action = accion; 
@@ -119,6 +144,87 @@ Action ComportamientoJugador::think(Sensores sensores)
 	return accion;
 }
 
+		if(sensores.bateria!=5000) buscarRecarga();
+
+String ComportamientoJugador::elegirPrioridad(){
+ if(sensores.terreno[2]="") accion = actWALK;
+}
+
+
+
+bool ComportamientoJugador::hayObjetoCerca(){
+ if(sensores.terreno[2]="") accion = actWALK;
+}
+
+void ComportamientoJugador::decideAccion(bool objetoCerca, bool obstaculoCerca){
+	//Decision de la nueva accion
+	int cas_obj=objetoCerca();
+
+	int coste = 0;
+
+	if(transitable(2)){
+		accion = actWALK;
+	}else if(transitable(2) && transitable(6)){
+		accion = actRUN;
+	}else if(!girar_derecha){ //girar_derecha es un booleano inicializado a false por lo que entrará aqui primero
+		accion = actTURN_L; //girará a la izq
+		girar_derecha = (rand()%2==0); //NUEVO VALOR ALEATORIO PARA girar_derecha
+	}else{
+		accion = actTURN_SR; //girará a la der
+		girar_derecha = (rand()%2==0);
+	}
+}
+
+bool ComportamientoJugador::transitable(int num){
+	if((sensores.terreno[num]=='T' || sensores.terreno[num]=='S' || sensores.terreno[num]=='G') && sensores.agentes='_'){
+		return true;
+	}else return false;
+
+	if((sensores.terreno[num]=='' || sensores.terreno[num]=='S' || sensores.terreno[num]=='G') && sensores.agentes='_'){
+		return true;
+	}else return false;
+
+}
+
+
+
+
+
+
+bool ComportamientoJugador::hayPrecipio(const state &st, vector<vector<unsigned char>> &matriz, Orientacion sentido){
+	switch(sentido){
+		case norte: 
+			if()
+		break;
+		case noreste: 
+			current_state.fil--;
+			current_state.col++;
+		break;
+		case este: 
+			current_state.col++; 
+		break;
+		case sureste: 
+			current_state.fil++;
+			current_state.col++;
+		break;
+		case sur: 
+			current_state.fil++; 
+		break;
+		case suroeste: 
+			current_state.fil++;
+			current_state.col--;
+		break;
+		case oeste: 
+			current_state.col--; 
+		break;
+		case noroeste: 
+			current_state.fil--;
+			current_state.col--;
+		break;
+	}
+}
+
+
 // extiende esta version inicial donde solo se pone la componente 0 
 // en la matriz; la nueva version debe poner todas las componentes 
 // de terreno en funcion de la orientacion del agente
@@ -127,10 +233,9 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 	//current_state -> st 
 	//mapaResultado -> matriz
 
-	matriz[st.fil][st.col] = terreno[0]; 
-
 	switch (st.brujula){
 		case norte: 
+		    
 			matriz[st.fil-1][st.col-1] = terreno[1]; 
 			matriz[st.fil-1][st.col] = terreno[2]; 
 			matriz[st.fil-1][st.col+1] = terreno[3]; 
@@ -148,8 +253,10 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil-3][st.col+1] = terreno[13]; 
 			matriz[st.fil-3][st.col+2] = terreno[14]; 
 			matriz[st.fil-3][st.col+3] = terreno[15]; 
+			
 		break;
 		case noreste: 
+
 			matriz[st.fil-1][st.col] = terreno[1]; 
 			matriz[st.fil-2][st.col] = terreno[4]; 
 			matriz[st.fil-3][st.col] = terreno[9]; 
@@ -168,8 +275,10 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil-1][st.col+3] = terreno[14]; 
 			matriz[st.fil-2][st.col+3] = terreno[13]; 
 			matriz[st.fil-3][st.col+3] = terreno[12]; 
+			
 		break;
 		case este: 
+
 			matriz[st.fil-1][st.col+1] = terreno[1]; 
 			matriz[st.fil][st.col+1] = terreno[2]; 
 			matriz[st.fil+1][st.col+1] = terreno[3]; 
@@ -187,8 +296,10 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil+1][st.col+3] = terreno[13]; 
 			matriz[st.fil+2][st.col+3] = terreno[14]; 
 			matriz[st.fil+3][st.col+3] = terreno[15]; 
+		  
 		break;
 		case sureste: 
+
 			matriz[st.fil][st.col+1] = terreno[1]; 
 			matriz[st.fil][st.col+2] = terreno[4]; 
 			matriz[st.fil][st.col+3] = terreno[9]; 
@@ -207,8 +318,10 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil+3][st.col+1] = terreno[14]; 
 			matriz[st.fil+3][st.col+2] = terreno[13]; 
 			matriz[st.fil+3][st.col+3] = terreno[12];
+			
 		break;
 		case sur: 
+
 			matriz[st.fil+1][st.col+1] = terreno[1]; 
 			matriz[st.fil+1][st.col] = terreno[2]; 
 			matriz[st.fil+1][st.col-1] = terreno[3]; 
@@ -226,8 +339,10 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil+3][st.col-1] = terreno[13]; 
 			matriz[st.fil+3][st.col-2] = terreno[14]; 
 			matriz[st.fil+3][st.col-3] = terreno[15]; 
+			
 		break;
 		case suroeste: 
+
 			matriz[st.fil+1][st.col] = terreno[1]; 
 			matriz[st.fil+2][st.col] = terreno[4]; 
 			matriz[st.fil+3][st.col] = terreno[9]; 
@@ -246,8 +361,10 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil+1][st.col-3] = terreno[14]; 
 			matriz[st.fil+2][st.col-3] = terreno[13]; 
 			matriz[st.fil+3][st.col-3] = terreno[12];
+		   
 		break;
 		case oeste: 
+
 			matriz[st.fil+1][st.col-1] = terreno[1]; 
 			matriz[st.fil][st.col-1] = terreno[2]; 
 			matriz[st.fil-1][st.col-1] = terreno[3]; 
@@ -265,8 +382,10 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil-1][st.col-3] = terreno[13]; 
 			matriz[st.fil-2][st.col-3] = terreno[14]; 
 			matriz[st.fil-3][st.col-3] = terreno[15]; 
+		 
 		break;
 		case noroeste: 
+
 			matriz[st.fil][st.col-1] = terreno[1]; 
 			matriz[st.fil][st.col-2] = terreno[4]; 
 			matriz[st.fil][st.col-3] = terreno[9]; 
@@ -285,7 +404,7 @@ void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & t
 			matriz[st.fil-3][st.col-1] = terreno[14]; 
 			matriz[st.fil-3][st.col-2] = terreno[13]; 
 			matriz[st.fil-3][st.col-3] = terreno[12];
-
+			
 		break;
 	}
 }
