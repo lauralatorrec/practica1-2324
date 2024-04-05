@@ -107,35 +107,35 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 		//Mover(sensores.terreno,bikini,zapatillas,recarga);
 
-		vector<char> linea1[3];
-		for(int i=0; i<3; i++) linea1.add('_');
-		vector<char> linea2[5];
-		vector<char> linea3[6];
+		vector<char> linea1;
+		for(int i=0; i<3; i++) linea1.push_back('_');
+		vector<char> linea2;
+		vector<char> linea3;
 		
 
 		for(int i=1; i<4; i++){
-			if(sensores.terreno[i]=='K' && !bikini) linea1[i--]='K';
-			else if(sensores.terreno[i]=='D' && !zapatillas) linea1[i--]='D';
-			else if(sensores.terreno[i]=='X' && !recarga) linea1[i--]='X';
+			if(sensores.terreno[i]=='K' && !bikini) linea1.push_back('K');
+			else if(sensores.terreno[i]=='D' && !zapatillas) linea1.push_back('D');
+			else if(sensores.terreno[i]=='X' ) linea1.push_back('X');
 		}
 
 		if(linea1.empty()){
-			for(int i=0; i<5; i++) linea2.add('_');
+			for(int i=0; i<5; i++) linea2.push_back('_');
 			for(int i=4; i<9; i++){
-				if(sensores.terreno[i]=='K' && !bikini) linea2[i--]='K';
-				else if(sensores.terreno[i]=='D' && !zapatillas)  linea2[i--]='D';
-				else if(sensores.terreno[i]=='X' && !recarga)  linea2[i--]='X';
+				if(sensores.terreno[i]=='K' && !bikini) linea2.push_back('K');
+				else if(sensores.terreno[i]=='D' && !zapatillas)  linea2.push_back('D');
+				else if(sensores.terreno[i]=='X' )  linea2.push_back('X');
 			}
 		}else{
 			accion=siguienteAccion(linea1);
 		}
 
 		if(linea1.empty() && linea2.empty()){
-			for(int i=0; i<6; i++) linea3.add('_');
+			for(int i=0; i<6; i++) linea3.push_back('_');
 			for(int i=9; i<16; i++){
-				if(sensores.terreno[i]=='K' && !bikini) linea3[i--]='K';
-				else if(sensores.terreno[i]=='D' && !zapatillas)  linea3[i--]='D';
-				else if(sensores.terreno[i]=='X' && !recarga)  linea3[i--]='X';
+				if(sensores.terreno[i]=='K' && !bikini) linea3.push_back('K');
+				else if(sensores.terreno[i]=='D' && !zapatillas)  linea3.push_back('D');
+				else if(sensores.terreno[i]=='X' )  linea3.push_back('X');
 			}
 		}else{
 			accion=siguienteAccion(linea2);
@@ -144,25 +144,28 @@ Action ComportamientoJugador::think(Sensores sensores)
 		if(linea1.empty() && linea2.empty() && !linea3.empty() ){
 			accion=siguienteAccion(linea3);
 		}
-		else if(linea1.empty() && linea2.empty() && linea3.empty() && casPos()!=-1){
-			accion=moverHacia(casPos());
+		else if(linea1.empty() && linea2.empty() && linea3.empty() && casPos(sensores)!=-1){
+			accion=moverHacia(casPos(sensores));
 		}
 
+
 		if(accion==actIDLE){
-			int cas_random =1+rand%17;
-			while(!transitable(sensores.terreno[cas_random])){
-				cas_random =1+rand%17;
-			} 
-			accion=moverHacia(cas_random);
+			if(transitable(2,sensores)) accion=actWALK;
+		}else if(!girar_derecha){
+			accion=actTURN_L;
+			girar_derecha=(rand()%2==0);
+		}else{
+			accion=actTURN_SR;
+			girar_derecha=(rand()%2==0);
 		}
 
 		//CASILLA EN LA QUE NOS ENCONTRAMOS:
 		if(sensores.terreno[0]='K') bikini=true;
 		else if(sensores.terreno[0]='D') zapatillas=true;
-		else if(sensores.terreno[0]='X') recarga();
+		else if(sensores.terreno[0]='X') recarga(sensores);
 
 		//RESETEO:
-		if(sensores.bateria==0) reset();
+		if(sensores.bateria==0) reset(sensores);
 		
 
 	// Actualización de acción realizada
@@ -197,22 +200,21 @@ Action ComportamientoJugador::think(Sensores sensores)
 	return accion;
 }
 
-void ComportamientoJugador::reset(){
+void ComportamientoJugador::reset(Sensores sensores){
 	bikini = false;
 	zapatillas = false;
 	sensores.bateria = 5000;
 }
 
-void ComportamientoJugador::recarga(){
-	if(sensores.bateria<4990){
-		recarga=true;
+void ComportamientoJugador::recarga(Sensores sensores){
+	if(sensores.bateria<=4990){
 		sensores.bateria = sensores.bateria+10;
 	}
 }
 
 
-int ComportamientoJugador::casPos(){
-	int pos=-1;
+int ComportamientoJugador::casPos(Sensores sensores){
+	int pos=-1, i=1;
 
 	while(pos!=-1 || i==16){
 		if(sensores.terreno[i]=='G' && i!=16) pos=i;
@@ -223,6 +225,7 @@ int ComportamientoJugador::casPos(){
 }
 
 Action ComportamientoJugador::moverHacia(int a){
+	Action accion = actIDLE;
 
 	if(a==2) accion=actWALK;
 	else if(a==6||a==12) accion=actRUN;
@@ -234,22 +237,23 @@ Action ComportamientoJugador::moverHacia(int a){
 
 
 
-Action ComportamientoJugador::siguienteAccion(vector<int> linea){
+Action ComportamientoJugador::siguienteAccion(vector<char> linea){
+	int a=0;
 	Action accion = actIDLE;
 	vector<int> posibles;
-		for(int j=0; j<linea.size(); j++){
-			if(linea[j]!='_') posibles.add(j);
-		}
-			
-			a = 1+rand() % (posibles().size()+1);
-			accion = moverHacia(a);
-			
+	for(int j=0; j<linea.size(); j++){
+		if(linea[j]!='_') posibles.push_back(j+1);
+	}
+		
+	a = 1+rand() % (posibles.size()+1);
+	accion = moverHacia(a);
+		
 	return accion;
 }
 
 
 
-bool ComportamientoJugador::transitable(int num){
+bool ComportamientoJugador::transitable(int num, Sensores sensores){
 	if((sensores.terreno[num]=='T' || sensores.terreno[num]=='S' || sensores.terreno[num]=='G') ){ //&& sensores.agentes='_'
 		return true;
 	}else return false;

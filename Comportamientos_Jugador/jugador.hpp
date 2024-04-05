@@ -24,6 +24,7 @@ class ComportamientoJugador : public Comportamiento{
       bien_situado=false;
       bikini=false;
       zapatillas=false;
+
     }
 
     //Constructor de copia
@@ -37,12 +38,12 @@ class ComportamientoJugador : public Comportamiento{
     int interact(Action accion, int valor);
     void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz);
 
-    void reset();
-    void recarga();
-    int casPos();
+    void reset(Sensores sensores);
+    void recarga(Sensores sensores);
+    int casPos(Sensores sensores);
     Action moverHacia(int a);
-    Action siguienteAccion(vector<int> linea);
-    bool transitable(int num);
+    Action siguienteAccion(vector<char> linea);
+    bool transitable(int num, Sensores sensores);
 
 
 
