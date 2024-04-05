@@ -161,6 +161,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 		else if(sensores.terreno[0]='D') zapatillas=true;
 		else if(sensores.terreno[0]='X') recarga();
 
+		//RESETEO:
+		if(sensores.bateria==0) reset();
 		
 
 	// Actualización de acción realizada
@@ -195,14 +197,18 @@ Action ComportamientoJugador::think(Sensores sensores)
 	return accion;
 }
 
+void ComportamientoJugador::reset(){
+	bikini = false;
+	zapatillas = false;
+	sensores.bateria = 5000;
+}
+
 void ComportamientoJugador::recarga(){
 	if(sensores.bateria<4990){
 		recarga=true;
 		sensores.bateria = sensores.bateria+10;
 	}
 }
-
-
 
 
 int ComportamientoJugador::casPos(){
