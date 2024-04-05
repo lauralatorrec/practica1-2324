@@ -35,6 +35,14 @@ class ComportamientoJugador : public Comportamiento{
     int interact(Action accion, int valor);
     void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz);
 
+    void recarga();
+    int casPos();
+    Action moverHacia(int a);
+    Action siguienteAccion(vector<int> linea);
+    bool transitable(int num);
+
+
+
   private:
   // Declarar aquí las variables de estado
   state current_state; //dónde estoy y hacia donde voy a dar prox paso

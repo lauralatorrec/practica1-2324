@@ -100,40 +100,67 @@ Action ComportamientoJugador::think(Sensores sensores)
 		
 		//Si está en una cas de pos estará bien situado, podemos registrar lo que ve el jugador en nuestro mapaResultado
 		if(bien_situado){ 
-			PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
+			ponerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
 		}
 
-		int i=0;
-		ArrayList prioridad;
-		while(prioridad.empty()){
-			if(sensores.terreno[i]=='K' && !bikini) prioridad.add(i);
-			else if(sensores.terreno[i]=='D' && !zapatillas) prioridad.add(i);
-			i++;
-		}
+		//PROXIMO MOVIMIENTO:
 
-		int j=0;
-		if(!recarga){
-			bool hay_recarga=false;
-			while(!hay_recarga)
-				if(sensores.terreno[j]=='X'){
-					prioridad.add(j);
-					hay_recarga=true;
-				}	
-			}
-		} 
+		//Mover(sensores.terreno,bikini,zapatillas,recarga);
 
-		if(prioridad.size()<2){
-			mover(i);
-		}
-
-		ArrayList prioridades = elegirPrioridad(posibles);
-
+		vector<char> linea1[3]={'_','_','_'};
+		vector<char> linea2[5];
+		vector<char> linea3[6];
 		
 
+		for(int i=1; i<4; i++){
+			if(sensores.terreno[i]=='K' && !bikini) linea1[i--]='K';
+			else if(sensores.terreno[i]=='D' && !zapatillas) linea1[i--]='D';
+			else if(sensores.terreno[i]=='X' && !recarga) linea1[i--]='X';
+		}
 
+		if(linea1.empty()){
+			linea2={'_','_','_','_','_'};
+			for(int i=4; i<9; i++){
+				if(sensores.terreno[i]=='K' && !bikini) linea2[i--]='K';
+				else if(sensores.terreno[i]=='D' && !zapatillas)  linea2[i--]='D';
+				else if(sensores.terreno[i]=='X' && !recarga)  linea2[i--]='X';
+			}
+		}else{
+			accion=siguienteAccion(linea1);
+		}
 
-	
-	
+		if(linea1.empty() && linea2.empty()){
+			linea3={'_','_','_','_','_','_'};
+			for(int i=9; i<16; i++){
+				if(sensores.terreno[i]=='K' && !bikini) linea3[i--]='K';
+				else if(sensores.terreno[i]=='D' && !zapatillas)  linea3[i--]='D';
+				else if(sensores.terreno[i]=='X' && !recarga)  linea3[i--]='X';
+			}
+		}else{
+			accion=siguienteAccion(linea2);
+		}
+
+		if(linea1.empty() && linea2.empty() && !linea3.empty() ){
+			accion=siguienteAccion(linea3);
+		}
+		else if(linea1.empty() && linea2.empty() && linea3.empty() && casPos()!=-1){
+			accion=moverHacia(casPos());
+		}
+
+		if(accion==actIDLE){
+			int cas_random =1+rand%17;
+			while(!transitable(sensores.terreno[cas_random])){
+				cas_random =1+rand%17;
+			} 
+			accion=moverHacia(cas_random);
+		}
+
+		//CASILLA EN LA QUE NOS ENCONTRAMOS:
+		if(sensores.terreno[0]='K') sensores.bikini=true;
+		else if(sensores.terreno[0]='D') sensores.zapatillas=true;
+		else if(sensores.terreno[0]='X') recarga();
+
+		
 
 	// Actualización de acción realizada
 	last_action = accion; 
@@ -167,94 +194,64 @@ Action ComportamientoJugador::think(Sensores sensores)
 	return accion;
 }
 
-
-
-
-		if(sensores.bateria!=5000) buscarRecarga();
-
-String ComportamientoJugador::elegirPrioridad(){
- if(sensores.terreno[2]="") accion = actWALK;
-}
-
-
-
-bool ComportamientoJugador::hayObjetoCerca(){
- if(sensores.terreno[2]="") accion = actWALK;
-}
-
-void ComportamientoJugador::decideAccion(bool objetoCerca, bool obstaculoCerca){
-	//Decision de la nueva accion
-	int cas_obj=objetoCerca();
-
-	int coste = 0;
-
-	if(transitable(2)){
-		accion = actWALK;
-	}else if(transitable(2) && transitable(6)){
-		accion = actRUN;
-	}else if(!girar_derecha){ //girar_derecha es un booleano inicializado a false por lo que entrará aqui primero
-		accion = actTURN_L; //girará a la izq
-		girar_derecha = (rand()%2==0); //NUEVO VALOR ALEATORIO PARA girar_derecha
-	}else{
-		accion = actTURN_SR; //girará a la der
-		girar_derecha = (rand()%2==0);
+void ComportamientoJugador::recarga(){
+	if(sensores.bateria<4990){
+		sensores.recarga=true;
+		sensores.bateria = sensores.bateria+10;
 	}
 }
+
+
+int ComportamientoJugador::casPos(){
+	int pos=-1;
+
+	while(pos!=-1 || i==16){
+		if(sensores.terreno[i]=='G' && i!=16) pos=i;
+		i++;
+	}
+
+	return pos;
+}
+
+Action ComportamientoJugador::moverHacia(int a){
+
+	if(a==2) accion=actWALK;
+	else if(a==6||a==12) accion=actRUN;
+	else if(a==1||a==4||a==5||a==10||a==11) accion=actTURN_L;
+	else if(a==3||a==7||a==8||a==14||a==15) accion=actTURN_SR;
+	
+	return accion;
+}
+
+
+
+Action ComportamientoJugador::siguienteAccion(vector<int> linea){
+	Action accion = actIDLE;
+	vector<int> posibles;
+		for(int j=0; j<linea.size(); j++){
+			if(linea[j]!='_') posibles.add(j);
+		}
+			
+			a = 1+rand() % (posibles().size()+1);
+			accion = moverHacia(a);
+			
+	return accion;
+}
+
+
 
 bool ComportamientoJugador::transitable(int num){
-	if((sensores.terreno[num]=='T' || sensores.terreno[num]=='S' || sensores.terreno[num]=='G') && sensores.agentes='_'){
+	if((sensores.terreno[num]=='T' || sensores.terreno[num]=='S' || sensores.terreno[num]=='G') ){ //&& sensores.agentes='_'
 		return true;
 	}else return false;
-
-	if((sensores.terreno[num]=='' || sensores.terreno[num]=='S' || sensores.terreno[num]=='G') && sensores.agentes='_'){
-		return true;
-	}else return false;
-
 }
 
-
-
-
-
-
-bool ComportamientoJugador::hayPrecipio(const state &st, vector<vector<unsigned char>> &matriz, Orientacion sentido){
-	switch(sentido){
-		case norte: 
-			if()
-		break;
-		case noreste: 
-			current_state.fil--;
-			current_state.col++;
-		break;
-		case este: 
-			current_state.col++; 
-		break;
-		case sureste: 
-			current_state.fil++;
-			current_state.col++;
-		break;
-		case sur: 
-			current_state.fil++; 
-		break;
-		case suroeste: 
-			current_state.fil++;
-			current_state.col--;
-		break;
-		case oeste: 
-			current_state.col--; 
-		break;
-		case noroeste: 
-			current_state.fil--;
-			current_state.col--;
-		break;
-	}
-}
 
 
 // extiende esta version inicial donde solo se pone la componente 0 
 // en la matriz; la nueva version debe poner todas las componentes 
 // de terreno en funcion de la orientacion del agente
-void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
+void ComportamientoJugador::ponerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
 	//sensores.terreno -> terreno
 	//current_state -> st 
 	//mapaResultado -> matriz
