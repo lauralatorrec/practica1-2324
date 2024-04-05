@@ -49,6 +49,9 @@ class ComportamientoJugador : public Comportamiento{
   Action last_action; //última acción que hice
   bool girar_derecha;
   bool bien_situado;
+  bool bikini;
+  bool zapatillas;
+  bool recarga;
   
 };
 #endif

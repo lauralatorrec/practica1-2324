@@ -100,14 +100,15 @@ Action ComportamientoJugador::think(Sensores sensores)
 		
 		//Si está en una cas de pos estará bien situado, podemos registrar lo que ve el jugador en nuestro mapaResultado
 		if(bien_situado){ 
-			ponerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
+			PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
 		}
 
 		//PROXIMO MOVIMIENTO:
 
 		//Mover(sensores.terreno,bikini,zapatillas,recarga);
 
-		vector<char> linea1[3]={'_','_','_'};
+		vector<char> linea1[3];
+		for(int i=0; i<3; i++) linea1.add('_');
 		vector<char> linea2[5];
 		vector<char> linea3[6];
 		
@@ -119,7 +120,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 		}
 
 		if(linea1.empty()){
-			linea2={'_','_','_','_','_'};
+			for(int i=0; i<5; i++) linea2.add('_');
 			for(int i=4; i<9; i++){
 				if(sensores.terreno[i]=='K' && !bikini) linea2[i--]='K';
 				else if(sensores.terreno[i]=='D' && !zapatillas)  linea2[i--]='D';
@@ -130,7 +131,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 		}
 
 		if(linea1.empty() && linea2.empty()){
-			linea3={'_','_','_','_','_','_'};
+			for(int i=0; i<6; i++) linea3.add('_');
 			for(int i=9; i<16; i++){
 				if(sensores.terreno[i]=='K' && !bikini) linea3[i--]='K';
 				else if(sensores.terreno[i]=='D' && !zapatillas)  linea3[i--]='D';
@@ -156,8 +157,8 @@ Action ComportamientoJugador::think(Sensores sensores)
 		}
 
 		//CASILLA EN LA QUE NOS ENCONTRAMOS:
-		if(sensores.terreno[0]='K') sensores.bikini=true;
-		else if(sensores.terreno[0]='D') sensores.zapatillas=true;
+		if(sensores.terreno[0]='K') bikini=true;
+		else if(sensores.terreno[0]='D') zapatillas=true;
 		else if(sensores.terreno[0]='X') recarga();
 
 		
@@ -196,10 +197,12 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 void ComportamientoJugador::recarga(){
 	if(sensores.bateria<4990){
-		sensores.recarga=true;
+		recarga=true;
 		sensores.bateria = sensores.bateria+10;
 	}
 }
+
+
 
 
 int ComportamientoJugador::casPos(){
@@ -251,7 +254,7 @@ bool ComportamientoJugador::transitable(int num){
 // extiende esta version inicial donde solo se pone la componente 0 
 // en la matriz; la nueva version debe poner todas las componentes 
 // de terreno en funcion de la orientacion del agente
-void ComportamientoJugador::ponerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
+void ComportamientoJugador::PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz){
 	//sensores.terreno -> terreno
 	//current_state -> st 
 	//mapaResultado -> matriz
