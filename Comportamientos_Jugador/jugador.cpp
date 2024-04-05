@@ -103,9 +103,32 @@ Action ComportamientoJugador::think(Sensores sensores)
 			PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
 		}
 
-		elegirPrioridad();
+		int i=0;
+		ArrayList prioridad;
+		while(prioridad.empty()){
+			if(sensores.terreno[i]=='K' && !bikini) prioridad.add(i);
+			else if(sensores.terreno[i]=='D' && !zapatillas) prioridad.add(i);
+			i++;
+		}
 
+		int j=0;
+		if(!recarga){
+			bool hay_recarga=false;
+			while(!hay_recarga)
+				if(sensores.terreno[j]=='X'){
+					prioridad.add(j);
+					hay_recarga=true;
+				}	
+			}
+		} 
 
+		if(prioridad.size()<2){
+			mover(i);
+		}
+
+		ArrayList prioridades = elegirPrioridad(posibles);
+
+		
 
 
 
@@ -143,6 +166,9 @@ Action ComportamientoJugador::think(Sensores sensores)
 	//Devuelve acción a realizar
 	return accion;
 }
+
+
+
 
 		if(sensores.bateria!=5000) buscarRecarga();
 
