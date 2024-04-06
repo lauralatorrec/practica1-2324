@@ -118,23 +118,27 @@ Action ComportamientoJugador::think(Sensores sensores)
 			int i=1;
 			bool prioridad=false;
 			while(i<16 && prioridad==false){
-				if((sensores.terreno[i]=='K' && !bikini && transitable(i,sensores))||(sensores.terreno[i]=='D' && !zapatillas && transitable(i,sensores)) || (sensores.terreno[i]=='X' && sensores.bateria<=4990 && transitable(i,sensores))){
-					moverHacia(i);
-					prioridad=true;
+				if((sensores.terreno[i]=='K' && !bikini)||(sensores.terreno[i]=='D' && !zapatillas) || (sensores.terreno[i]=='X')){
+					if(transitable(i,sensores)){
+						moverHacia(i);
+						prioridad=true;
+					}
 				}
 				i++;
 			}
-			if(!prioridad){
-
+			if(!prioridad || last_action==actIDLE){
 				if(transitable(2,sensores)) accion=actWALK;
 				else if(transitable(6,sensores)) accion=actRUN;
-				else if(girar_derecha){
-					accion=actTURN_SR;
-					girar_derecha=(rand()%2==0);
-				}else{
-					accion=actTURN_L;
-					girar_derecha=(rand()%2==0);
-				} 
+				
+				if(!transitable(2,sensores)){
+					if(girar_derecha){
+						accion=actTURN_SR;
+						girar_derecha=(rand()%2==0);
+					}else{	
+						accion=actTURN_L;
+						girar_derecha=(rand()%2==0);
+					} 
+				}
 
 			}
 		
@@ -179,7 +183,7 @@ void ComportamientoJugador::reset(Sensores sensores){
 
 void ComportamientoJugador::recarga(Sensores sensores){
 	if(sensores.bateria<=4990){
-		sensores.bateria = sensores.bateria+10;
+		sensores.bateria +=10;
 	}
 }
 
