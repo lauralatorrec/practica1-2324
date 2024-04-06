@@ -123,14 +123,12 @@ Action ComportamientoJugador::think(Sensores sensores)
 						moverHacia(i);
 						prioridad=true;
 					}
-				}
-				i++;
+				
+				}i++;
 			}
 			if(!prioridad || last_action==actIDLE){
 				if(transitable(2,sensores)) accion=actWALK;
-				else if(transitable(6,sensores)) accion=actRUN;
-				
-				if(!transitable(2,sensores)){
+				else{
 					if(girar_derecha){
 						accion=actTURN_SR;
 						girar_derecha=(rand()%2==0);
