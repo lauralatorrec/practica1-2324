@@ -135,16 +135,10 @@ Action ComportamientoJugador::think(Sensores sensores)
 						prioridad=true;
 					}*/
 				
-			/*if (sensores.terreno[2]=='X'){
-				accion==actWALK;
-				prioridad=true;
-			}else if (sensores.terreno[6]=='X' && transitable(2,sensores)){
-				accion==actRUN;
-				prioridad=true;
-			}else if(((sensores.terreno[6]=='K' && !bikini) || (sensores.terreno[6]=='D' && !zapatillas)) && transitable(2,sensores)){
+			if((sensores.terreno[6]=='X' || (sensores.terreno[6]=='K' && !bikini) || (sensores.terreno[6]=='D' && !zapatillas)) && transitable(2,sensores)){
 				accion=actRUN;
 				prioridad=true;
-			}else if((sensores.terreno[2]=='K' && !bikini) || (sensores.terreno[2]=='D' && !zapatillas) ){
+			}else if(sensores.terreno[2]=='X' || (sensores.terreno[2]=='K' && !bikini) || (sensores.terreno[2]=='D' && !zapatillas) ){
 				accion=actWALK;
 				prioridad=true;
 			}else if((sensores.terreno[1]=='K' && !bikini) || (sensores.terreno[1]=='D' && !zapatillas)){
@@ -153,7 +147,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 			}else if((sensores.terreno[3]=='K' && !bikini) || (sensores.terreno[3]=='D' && !zapatillas)){
 				accion=actTURN_SR;
 				prioridad=true;
-			}*/
+			}
 
 			
 			/*if(!prioridad){
@@ -165,7 +159,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 						}
 					}
 				}
-			}*/
+			}
 
 			int i=1;
 			while(!prioridad && i<16){
@@ -173,7 +167,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 					moverHacia(accion, i);
 					prioridad=true;
 				}i++;
-			}
+			}*/
 
 
 			if(!prioridad || accion==actIDLE){
