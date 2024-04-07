@@ -99,7 +99,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 			current_state.brujula=sensores.sentido;
 			bien_situado=true;
 		}
-		
+
 		//Si está en una cas de pos estará bien situado, podemos registrar lo que ve el jugador en nuestro mapaResultado
 		if(bien_situado){ 
 			PonerTerrenoEnMatriz(sensores.terreno, current_state, mapaResultado);	
@@ -115,30 +115,48 @@ Action ComportamientoJugador::think(Sensores sensores)
 		//PROXIMO MOVIMIENTO
 		//ir a casillas directas si hay objeto o necesitamos recarga
 	
-			int i=1;
+		
 			bool prioridad=false;
-			while(i<16 && prioridad==false){
-				if((sensores.terreno[i]=='K' && !bikini)||(sensores.terreno[i]=='D' && !zapatillas) || (sensores.terreno[i]=='X')){
-					if(transitable(i,sensores)){
-						moverHacia(i);
-						prioridad=true;
-					}
-				
-				}i++;
+
+			if (sensores.terreno[2]=='X'){
+				accion==actWALK;
+				prioridad=true;
+			}else if (sensores.terreno[6]=='X' && transitable(2,sensores)){
+				accion==actRUN;
+				prioridad=true;
 			}
-			if(!prioridad || last_action==actIDLE){
+
+			if(((sensores.terreno[6]=='K' && !bikini) || (sensores.terreno[6]=='D' && !zapatillas)) && transitable(2,sensores) && transitable(6,sensores)){
+				accion==actRUN;
+				prioridad=true;
+			}else if(((sensores.terreno[2]=='K' && !bikini) || (sensores.terreno[2]=='D' && !zapatillas)) && transitable(2,sensores)){
+				accion==actWALK;
+				prioridad=true;
+			}
+
+
+			/*for(int i=1; i<16;i++){
+				if(){
+						if(!prioridad && transitable(i,sensores)){
+							moverHacia(i);
+							prioridad=true;
+						}
+				}
+			}*/
+				
+			if(!prioridad){
 				if(transitable(2,sensores)) accion=actWALK;
-				else{
-					if(girar_derecha){
-						accion=actTURN_SR;
-						girar_derecha=(rand()%2==0);
-					}else{	
+				else if(!girar_derecha){
 						accion=actTURN_L;
 						girar_derecha=(rand()%2==0);
+					}else{	
+						accion=actTURN_SR;
+						girar_derecha=(rand()%2==0);
 					} 
-				}
-
 			}
+
+
+			
 		
 		
 	// Actualización de acción realizada
@@ -180,7 +198,7 @@ void ComportamientoJugador::reset(Sensores sensores){
 }
 
 void ComportamientoJugador::recarga(Sensores sensores){
-	if(sensores.bateria<=4990){
+	if(sensores.bateria<=4990){ //max bateria es 5000
 		sensores.bateria +=10;
 	}
 }
@@ -227,7 +245,7 @@ Action ComportamientoJugador::siguienteAccion(vector<char> linea){
 
 
 bool ComportamientoJugador::transitable(int num, Sensores sensores){
-	if((sensores.terreno[num]=='T' || sensores.terreno[num]=='S' || sensores.terreno[num]=='G' ||sensores.terreno[num]=='K' || sensores.terreno[num]=='D' || sensores.terreno[num]=='X' ) && (sensores.agentes[num]='_' )){ 
+	if(sensores.terreno[num]!='P' && sensores.terreno[num]!='M'){ 
 		return true;
 	}else return false;
 }

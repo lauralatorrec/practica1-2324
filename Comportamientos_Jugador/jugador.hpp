@@ -24,6 +24,7 @@ class ComportamientoJugador : public Comportamiento{
       bien_situado=false;
       bikini=false;
       zapatillas=false;
+      prioridad=false;
 
     }
 
@@ -55,6 +56,7 @@ class ComportamientoJugador : public Comportamiento{
   bool bien_situado;
   bool bikini;
   bool zapatillas;
+  bool prioridad;
   
 };
 #endif
