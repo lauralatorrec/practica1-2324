@@ -118,6 +118,11 @@ Action ComportamientoJugador::think(Sensores sensores)
 		
 			bool prioridad=false;
 
+
+
+
+			/*
+
 			if (sensores.terreno[2]=='X'){
 				accion==actWALK;
 				prioridad=true;
@@ -132,19 +137,36 @@ Action ComportamientoJugador::think(Sensores sensores)
 			}else if(((sensores.terreno[2]=='K' && !bikini) || (sensores.terreno[2]=='D' && !zapatillas)) && transitable(2,sensores)){
 				accion==actWALK;
 				prioridad=true;
+			}*/
+
+
+			if (sensores.terreno[2]=='X'){
+				accion==actWALK;
+				prioridad=true;
+			}else if (sensores.terreno[6]=='X' && transitable(2,sensores)){
+				accion==actRUN;
+				prioridad=true;
+			}
+
+			int b=0;
+
+			if(!prioridad){
+				for(int i=1; i<16;i++){
+					if(i!=2 && i!=6 && ((sensores.terreno[i]=='K' && !bikini) || (sensores.terreno[i]=='D' && !zapatillas) || (sensores.terreno[i]=='X'))){
+						if(!prioridad){
+							b=i;
+							prioridad=true;
+						}
+					}
+				}
 			}
 
 
-			/*for(int i=1; i<16;i++){
-				if(){
-						if(!prioridad && transitable(i,sensores)){
-							moverHacia(i);
-							prioridad=true;
-						}
-				}
-			}*/
-				
-			if(!prioridad){
+			if(prioridad && b!=0){
+				if(b==1||b==4||b==5||b==10||b==11) accion=actTURN_L;
+				else if(b==3||b==7||b==8||b==14||b==15) accion=actTURN_SR;
+			}
+			if(accion=actIDLE){
 				if(transitable(2,sensores)) accion=actWALK;
 				else if(!girar_derecha){
 						accion=actTURN_L;
@@ -245,7 +267,7 @@ Action ComportamientoJugador::siguienteAccion(vector<char> linea){
 
 
 bool ComportamientoJugador::transitable(int num, Sensores sensores){
-	if(sensores.terreno[num]!='P' && sensores.terreno[num]!='M'){ 
+	if(sensores.terreno[num]!='P' && sensores.terreno[num]!='M' && sensores.agentes[num]=='_'){ 
 		return true;
 	}else return false;
 }
