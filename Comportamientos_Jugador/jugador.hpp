@@ -40,9 +40,9 @@ class ComportamientoJugador : public Comportamiento{
     void PonerTerrenoEnMatriz(const vector<unsigned char> & terreno, const state &st, vector<vector<unsigned char>> &matriz);
 
     void reset(Sensores sensores);
-    void recarga(Sensores sensores);
+    void recarga(Sensores &sensores);
     int casPos(Sensores sensores);
-    Action moverHacia(int a);
+    void moverHacia(Action &accion, int a);
     Action siguienteAccion(vector<char> linea);
     bool transitable(int num, Sensores sensores);
 

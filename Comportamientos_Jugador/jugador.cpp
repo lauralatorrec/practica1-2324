@@ -45,32 +45,32 @@ Action ComportamientoJugador::think(Sensores sensores)
 		case actRUN: //correr
 			switch (current_state.brujula){
 				case norte: 
-					current_state.fil-2; 
+					current_state.fil-=2; 
 				break;
 				case noreste: 
-					current_state.fil-2;
-					current_state.col+2;
+					current_state.fil-=2;
+					current_state.col+=2;
 				break;
 				case este: 
-					current_state.col+2; 
+					current_state.col+=2; 
 				break;
 				case sureste: 
-					current_state.fil+2;
-					current_state.col+2;
+					current_state.fil+=2;
+					current_state.col+=2;
 				break;
 				case sur: 
-					current_state.fil+2; 
+					current_state.fil+=2; 
 				break;
 				case suroeste: 
-					current_state.fil+2;
-					current_state.col-2;
+					current_state.fil+=2;
+					current_state.col-=2;
 				break;
 				case oeste: 
-					current_state.col-2; 
+					current_state.col-=2; 
 				break;
 				case noroeste: 
-					current_state.fil-2;
-					current_state.col-2;
+					current_state.fil-=2;
+					current_state.col-=2;
 				break;
 			}
 		break;
@@ -107,19 +107,73 @@ Action ComportamientoJugador::think(Sensores sensores)
 
 		if(sensores.terreno[0]='K') bikini=true;
 		else if(sensores.terreno[0]='D') zapatillas=true;
-		else if(sensores.terreno[0]='X') recarga(sensores);
+		else if(sensores.terreno[0]='X'){
+			if(sensores.bateria<=4990){ //max bateria es 5000
+				sensores.bateria +=10;
+			}
+		}
 
 		//RESETEO:
 		if(sensores.bateria==0) reset(sensores);
 
 		//PROXIMO MOVIMIENTO
-		//ir a casillas directas si hay objeto o necesitamos recarga
-	
-		
+
 			bool prioridad=false;
 
+			if (sensores.terreno[2]=='X'){
+				accion==actWALK;
+				prioridad=true;
+			}else if (sensores.terreno[6]=='X' && transitable(2,sensores)){
+				accion==actRUN;
+				prioridad=true;
+			}
 
 
+			if(!prioridad){
+				for(int i=1; i<16;i++){
+					if(i!=2 && i!=6 && ((sensores.terreno[i]=='K' && !bikini) || (sensores.terreno[i]=='D' && !zapatillas) || (sensores.terreno[i]=='X'))){
+						if(!prioridad){
+							moverHacia(accion, i);
+							prioridad=true;
+						}
+					}
+				}
+			}
+
+			if(!prioridad || accion==actIDLE){
+				if(transitable(2,sensores) && transitable(6,sensores)) accion=actRUN;
+				else if (transitable(2,sensores) ) accion=actWALK;
+				else if(!girar_derecha){
+						accion=actTURN_L;
+						girar_derecha=(rand()%2==0);
+					}else{	
+						accion=actTURN_SR;
+						girar_derecha=(rand()%2==0);
+					} 
+			}
+
+			/*
+			int i=1;
+			while(!prioridad && i<16){
+				if((sensores.terreno[i]=='K' && !bikini) || (sensores.terreno[i]=='D' && !zapatillas) || (sensores.terreno[i]=='X')){
+					moverHacia(accion,i);
+					prioridad=true;
+				}
+				i++;
+
+			}
+
+			if(!prioridad || accion==actIDLE){
+				if(transitable(2,sensores) && transitable(6,sensores)) accion=actRUN;
+				else if (transitable(2,sensores) ) accion=actWALK;
+				else if(!girar_derecha){
+						accion=actTURN_L;
+						girar_derecha=(rand()%2==0);
+					}else{	
+						accion=actTURN_SR;
+						girar_derecha=(rand()%2==0);
+					} 
+			}
 
 			/*
 
@@ -140,6 +194,9 @@ Action ComportamientoJugador::think(Sensores sensores)
 			}*/
 
 
+
+
+			/*
 			if (sensores.terreno[2]=='X'){
 				accion==actWALK;
 				prioridad=true;
@@ -175,7 +232,7 @@ Action ComportamientoJugador::think(Sensores sensores)
 						accion=actTURN_SR;
 						girar_derecha=(rand()%2==0);
 					} 
-			}
+			}*/
 
 
 			
@@ -219,7 +276,7 @@ void ComportamientoJugador::reset(Sensores sensores){
 	sensores.bateria = 5000;
 }
 
-void ComportamientoJugador::recarga(Sensores sensores){
+void ComportamientoJugador::recarga(Sensores &sensores){
 	if(sensores.bateria<=4990){ //max bateria es 5000
 		sensores.bateria +=10;
 	}
@@ -237,22 +294,18 @@ int ComportamientoJugador::casPos(Sensores sensores){
 	return pos;
 }
 
-Action ComportamientoJugador::moverHacia(int a){
-	Action accion = actIDLE;
-
+void ComportamientoJugador::moverHacia(Action &accion, int a){
 	if(a==2) accion=actWALK;
 	else if(a==6||a==12) accion=actRUN;
 	else if(a==1||a==4||a==5||a==10||a==11) accion=actTURN_L;
 	else if(a==3||a==7||a==8||a==14||a==15) accion=actTURN_SR;
-	
-	return accion;
 }
 
 
 
 Action ComportamientoJugador::siguienteAccion(vector<char> linea){
-	int a=0;
-	Action accion = actIDLE;
+	/*int a=0;
+	
 	vector<int> posibles;
 	for(int j=0; j<linea.size(); j++){
 		if(linea[j]!='_') posibles.push_back(j+1);
@@ -260,7 +313,8 @@ Action ComportamientoJugador::siguienteAccion(vector<char> linea){
 		
 	a = 1+rand() % (posibles.size()+1);
 	accion = moverHacia(a);
-		
+	*/	
+	Action accion = actIDLE;
 	return accion;
 }
 
